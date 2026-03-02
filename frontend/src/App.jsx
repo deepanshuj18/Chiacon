@@ -43,8 +43,8 @@ export default function App() {
           margin: '12px auto 0',
           lineHeight: 1.75,
         }}>
-          Identify AI-powered automation opportunities and generate executive outreach
-          — built for enterprise transformation.
+          Identify RPA, Data &amp; Analytics, and AI-driven automation opportunities
+          — and generate executive outreach for enterprise transformation.
         </p>
 
         {/* ── Strategic Positioning Line ───────────────────────────── */}
