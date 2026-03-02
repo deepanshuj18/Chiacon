@@ -93,6 +93,10 @@ async def generate_automation(req: AutomationRequest):
         data = generate_json_response(system_prompt, user_prompt)
         return AutomationResponse(**data)
     except Exception as e:
+        import traceback
+        print("===== GEMINI ERROR =====")
+        print(str(e))
+        print(traceback.format_exc())
         err = str(e)
         if "429" in err or "quota" in err.lower() or "rate" in err.lower():
             raise HTTPException(

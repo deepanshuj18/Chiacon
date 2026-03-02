@@ -1,13 +1,16 @@
 """
 Centralized Gemini API service layer.
-Reuses a single model instance for all requests.
+Uses the new google-genai SDK (GA).
 Includes retry logic for rate-limit (429) errors.
+Logs token usage for cost control and monitoring.
 """
 
 import os
 import json
+import re
 import time
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,12 +22,33 @@ if not _api_key or _api_key == "your_gemini_api_key_here":
         "Copy backend/.env.example to backend/.env and add your key."
     )
 
-genai.configure(api_key=_api_key)
+client = genai.Client(api_key=_api_key)
 
-_model = genai.GenerativeModel("models/gemini-2.0-flash")
+MODEL = "gemini-2.5-flash"
 
 MAX_RETRIES = 3
 BASE_DELAY = 10  # seconds
+
+
+def _log_usage(response, start_time: float):
+    """Log token usage and latency from a Gemini response."""
+    elapsed = round(time.time() - start_time, 2)
+    usage = getattr(response, "usage_metadata", None)
+
+    if usage:
+        prompt_tokens = getattr(usage, "prompt_token_count", 0)
+        output_tokens = getattr(usage, "candidates_token_count", 0)
+        total_tokens = getattr(usage, "total_token_count", 0)
+
+        print(
+            f"[Gemini] Model: {MODEL} | "
+            f"Prompt: {prompt_tokens} tk | "
+            f"Output: {output_tokens} tk | "
+            f"Total: {total_tokens} tk | "
+            f"Latency: {elapsed}s"
+        )
+    else:
+        print(f"[Gemini] Model: {MODEL} | Latency: {elapsed}s | (no usage metadata)")
 
 
 def generate_response(system_prompt: str, user_prompt: str) -> str:
@@ -33,15 +57,17 @@ def generate_response(system_prompt: str, user_prompt: str) -> str:
     last_error = None
     for attempt in range(MAX_RETRIES + 1):
         try:
-            response = _model.generate_content(
-                [
-                    {"role": "user", "parts": [f"{system_prompt}\n\n{user_prompt}"]},
-                ],
-                generation_config=genai.GenerationConfig(
-                    temperature=0.7,
-                    max_output_tokens=1024,
+            start = time.time()
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=f"{system_prompt}\n\n{user_prompt}",
+                config=types.GenerateContentConfig(
+                    temperature=0.4,
+                    max_output_tokens=2048,
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
                 ),
             )
+            _log_usage(response, start)
             return response.text
         except Exception as e:
             last_error = e
@@ -58,6 +84,26 @@ def generate_response(system_prompt: str, user_prompt: str) -> str:
     raise last_error
 
 
+def _safe_json_parse(text: str) -> dict:
+    """Parse JSON from model output with fallback regex extraction."""
+    # First try direct parse
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback: extract the first { ... } block
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group())
+        except json.JSONDecodeError:
+            pass
+
+    # Nothing worked — raise with original text for debugging
+    raise ValueError(f"Could not parse JSON from model output: {text[:200]}...")
+
+
 def generate_json_response(system_prompt: str, user_prompt: str) -> dict:
     """Send a prompt to Gemini and parse the response as JSON."""
     raw = generate_response(system_prompt, user_prompt)
@@ -66,10 +112,9 @@ def generate_json_response(system_prompt: str, user_prompt: str) -> dict:
     cleaned = raw.strip()
     if cleaned.startswith("```"):
         lines = cleaned.split("\n")
-        # Remove first and last lines (the fences)
         lines = lines[1:]
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         cleaned = "\n".join(lines).strip()
 
-    return json.loads(cleaned)
+    return _safe_json_parse(cleaned)
