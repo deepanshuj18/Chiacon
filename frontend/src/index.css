@@ -1,0 +1,445 @@
+@import "tailwindcss";
+
+/* ─── Custom Properties ─────────────────────────────────────────────── */
+:root {
+  --bg-primary: #080c18;
+  --bg-card: rgba(15, 21, 40, 0.75);
+  --border-color: rgba(99, 102, 241, 0.18);
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient background glow + subtle grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(99, 102, 241, 0.1), transparent),
+    radial-gradient(ellipse 50% 30% at 80% 80%, rgba(167, 139, 250, 0.05), transparent),
+    linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Glassmorphism Card ────────────────────────────────────────────── */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 40px rgba(99, 102, 241, 0.08);
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-block;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.45);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent-light);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 11px 24px;
+  border-radius: 11px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--accent-light);
+}
+
+/* ─── Form Inputs ───────────────────────────────────────────────────── */
+.input-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.input-field {
+  width: 100%;
+  background: rgba(8, 14, 32, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 12px;
+  padding: 13px 16px;
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(8, 14, 32, 0.8);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+textarea.input-field {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.6;
+}
+
+/* Dropdown select */
+select.input-field {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 44px;
+  cursor: pointer;
+}
+
+select.input-field option {
+  background: #0f1520;
+  color: #f1f5f9;
+  padding: 8px;
+}
+
+/* Form field spacing */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Tab System ────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: rgba(8, 14, 32, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 5px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 11px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  background: transparent;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+}
+
+/* ─── Result Cards ──────────────────────────────────────────────────── */
+.result-card {
+  background: rgba(8, 14, 32, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+
+.result-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-light);
+  margin-bottom: 12px;
+}
+
+.result-text {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.result-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.result-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 6px;
+}
+
+/* ─── Email Display ─────────────────────────────────────────────────── */
+.email-block {
+  background: rgba(8, 14, 32, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 14px;
+  padding: 28px;
+}
+
+.email-subject-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.email-subject-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.email-body {
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* ─── Loading Spinner ───────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Error State ───────────────────────────────────────────────────── */
+.error-msg {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fca5a5;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* ─── Fade-in ───────────────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.35s ease-out both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Stagger animation for result cards ───────────────────────────── */
+.stagger-in {
+  animation: staggerIn 0.4s ease-out both;
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.result-card:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.result-card:nth-child(3) {
+  animation-delay: 0.25s;
+}
+
+/* Subtle left accent on result card hover */
+.result-card {
+  background: rgba(8, 14, 32, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 14px;
+  padding: 22px 24px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: staggerIn 0.4s ease-out both;
+}
+
+.result-card:hover {
+  border-color: rgba(99, 102, 241, 0.28);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.08), 0 4px 20px rgba(99, 102, 241, 0.06);
+}
+
+/* ─── Action Buttons (Copy / Download) ─────────────────────────────── */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 9px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.06);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.action-btn:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent-light);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Context Banner ────────────────────────────────────────────────── */
+.context-banner {
+  margin-bottom: 24px;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: rgba(99, 102, 241, 0.07);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  animation: fadeIn 0.3s ease-out both;
+}
+
+/* ─── Locked Pill ───────────────────────────────────────────────────── */
+.locked-pill {
+  font-size: 0.68rem;
+  background: rgba(99, 102, 241, 0.14);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
