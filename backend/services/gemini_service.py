@@ -21,7 +21,7 @@ if not _api_key or _api_key == "your_gemini_api_key_here":
 
 genai.configure(api_key=_api_key)
 
-_model = genai.GenerativeModel("gemini-2.0-flash")
+_model = genai.GenerativeModel("models/gemini-2.0-flash")
 
 MAX_RETRIES = 3
 BASE_DELAY = 10  # seconds
