@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import UseCaseGenerator from './components/UseCaseGenerator';
 import EmailGenerator from './components/EmailGenerator';
 
@@ -19,8 +19,40 @@ export default function App() {
     setAutomationIndustry(null);
   };
 
+  // Cold-start banner — show once per session
+  const [showBanner, setShowBanner] = useState(
+    () => !sessionStorage.getItem('banner-dismissed')
+  );
+  const [bannerFading, setBannerFading] = useState(false);
+
+  const dismissBanner = () => {
+    setBannerFading(true);
+    setTimeout(() => {
+      setShowBanner(false);
+      sessionStorage.setItem('banner-dismissed', '1');
+    }, 400);
+  };
+
+  useEffect(() => {
+    if (!showBanner) return;
+    const t = setTimeout(dismissBanner, 8000);
+    return () => clearTimeout(t);
+  }, [showBanner]);
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+
+      {/* ── Cold-start Banner ────────────────────────────────────────── */}
+      {showBanner && (
+        <div className={`coldstart-banner${bannerFading ? ' fading' : ''}`}>
+          <span className="coldstart-icon">⚡</span>
+          <div className="coldstart-text">
+            <strong>First request may take ~30 seconds</strong>
+            <span>The server sleeps when inactive. It wakes up automatically — just give it a moment.</span>
+          </div>
+          <button className="coldstart-close" onClick={dismissBanner} aria-label="Dismiss">✕</button>
+        </div>
+      )}
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header style={{ padding: '52px 24px 20px', textAlign: 'center' }}>

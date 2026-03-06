@@ -50,6 +50,77 @@ body::before {
   z-index: 1;
 }
 
+/* ─── Cold-start Banner ─────────────────────────────────────────────── */
+@keyframes bannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coldstart-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(234, 179, 8, 0.08);
+  border-bottom: 1px solid rgba(234, 179, 8, 0.2);
+  animation: bannerIn 0.35s ease forwards;
+  transition: opacity 0.4s ease;
+  position: relative;
+  z-index: 100;
+}
+
+.coldstart-banner.fading {
+  opacity: 0;
+}
+
+.coldstart-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.coldstart-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.coldstart-text strong {
+  font-size: 0.82rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.coldstart-text span {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.coldstart-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.coldstart-close:hover {
+  color: #94a3b8;
+}
+
+
 /* ─── Glassmorphism Card ────────────────────────────────────────────── */
 .glass-card {
   background: var(--bg-card);
